@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import NavigationBar from "../../components/navigation-bar";
 
 function MainComponent() {
