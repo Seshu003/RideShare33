@@ -1,0 +1,9 @@
+{
+  "name": "RideShare",
+  "version": "1.0.0",
+  "description": "A platform for sharing rides and connecting travelers",
+  "api": {
+    "version": "v1",
+    "baseUrl": "/api"
+  }
+}

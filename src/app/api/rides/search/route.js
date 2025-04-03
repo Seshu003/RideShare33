@@ -1,0 +1,67 @@
+import { connectDB } from '../../../../api/config/mongodb/connection';
+import { Ride } from '../../../../api/database/models';
+
+export async function POST(request) {
+  try {
+    await connectDB();
+    const { origin, destination, searchDate, time, seats, priceRange, departureTime, vehicleType } = await request.json();
+
+    const query = {
+      status: 'active',
+      available_seats: { $gte: seats || 1 }
+    };
+
+    if (origin) query.origin = new RegExp(origin, 'i');
+    if (destination) query.destination = new RegExp(destination, 'i');
+
+    if (searchDate) {
+      const startOfDay = new Date(searchDate);
+      const endOfDay = new Date(searchDate);
+      endOfDay.setHours(23, 59, 59, 999);
+      query.departure_time = {
+        $gte: startOfDay,
+        $lte: endOfDay
+      };
+    }
+
+    if (priceRange) {
+      query.price_per_seat = {
+        $gte: priceRange[0] || 0,
+        $lte: priceRange[1] || 1000
+      };
+    }
+
+    if (vehicleType && vehicleType !== 'any') {
+      query.vehicle_type = vehicleType;
+    }
+
+    if (departureTime && departureTime !== 'any') {
+      const timeRanges = {
+        morning: { $gte: 6, $lt: 12 },
+        afternoon: { $gte: 12, $lt: 18 },
+        evening: { $gte: 18, $lt: 24 }
+      };
+      if (timeRanges[departureTime]) {
+        query.$expr = {
+          $and: [
+            { $gte: [{ $hour: '$departure_time' }, timeRanges[departureTime].$gte] },
+            { $lt: [{ $hour: '$departure_time' }, timeRanges[departureTime].$lt] }
+          ]
+        };
+      }
+    }
+
+    const rides = await Ride.find(query)
+      .populate('driver')
+      .sort({ departure_time: 1 })
+      .lean();
+
+    return Response.json({ success: true, rides });
+  } catch (error) {
+    console.error('Search rides error:', error);
+    return Response.json(
+      { success: false, error: 'Failed to search rides' },
+      { status: 500 }
+    );
+  }
+}
