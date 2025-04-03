@@ -3,20 +3,11 @@
   "buildCommand": "next build",
   "installCommand": "npm install",
   "framework": "nextjs",
-  "regions": ["all"],
   "env": {
     "NEXT_PUBLIC_API_URL": "@next_public_api_url",
     "NEXT_PUBLIC_APP_URL": "@next_public_app_url",
     "MONGODB_URI": "@mongodb_uri",
     "LOCATIONIQ_API_KEY": "@locationiq_api_key"
-  },
-  "build": {
-    "env": {
-      "NEXT_PUBLIC_API_URL": "@next_public_api_url",
-      "NEXT_PUBLIC_APP_URL": "@next_public_app_url",
-      "MONGODB_URI": "@mongodb_uri",
-      "LOCATIONIQ_API_KEY": "@locationiq_api_key"
-    }
   },
   "headers": [
     {
